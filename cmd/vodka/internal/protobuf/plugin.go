@@ -2,8 +2,8 @@ package protobuf
 
 import (
 	"flag"
-	"fmt"
 
+	"github.com/allen-shaw/vodka/cmd/vodka/internal/protobuf/log"
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/types/pluginpb"
 )
@@ -20,7 +20,7 @@ func (p *Plugin) Run() int {
 	options.Run(func(gen *protogen.Plugin) error {
 		gen.SupportedFeatures = uint64(pluginpb.CodeGeneratorResponse_FEATURE_PROTO3_OPTIONAL)
 		for _, f := range gen.Files {
-			fmt.Println("file:", f)
+			log.Debug("file:%v\n", f.Desc.Path())
 			if !f.Generate {
 				continue
 			}
