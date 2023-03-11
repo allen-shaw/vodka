@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/allen-shaw/vodka/cmd/vodka/internal/args"
+	"github.com/allen-shaw/vodka/cmd/vodka/internal/generator"
 	"github.com/allen-shaw/vodka/cmd/vodka/internal/help"
 	"github.com/allen-shaw/vodka/cmd/vodka/internal/meta"
 )
@@ -9,6 +10,9 @@ import (
 type initHandler struct {
 	root string
 	idls []string
+
+	layout *generator.Layout
+	code   *generator.Gin
 }
 
 func newInitHandler(arg *args.Init) *initHandler {
@@ -16,6 +20,8 @@ func newInitHandler(arg *args.Init) *initHandler {
 		root: arg.Out,
 		idls: arg.IDLs,
 	}
+	h.layout = generator.NewLayout(h.root)
+	h.code = generator.NewGin(h.root, h.idls)
 
 	h.checkFiles()
 	return h
@@ -34,9 +40,10 @@ func (h *initHandler) Run() {
 	meta.CreateMeta(h.root, h.idls)
 
 	// 2. 在out目录下创建layout
+	h.layout.Gen()
 
 	// 3. 根据模板创建文件
-
+	h.code.Gen()
 }
 
 // 1. layout manager 在指定目录创建layout

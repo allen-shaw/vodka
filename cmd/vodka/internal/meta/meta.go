@@ -1,11 +1,13 @@
 package meta
 
 import (
+	"os"
 	"path/filepath"
 
 	"github.com/allen-shaw/vodka/cmd/vodka/internal/help"
 	"github.com/allen-shaw/vodka/cmd/vodka/internal/util"
 	"github.com/allen-shaw/vodka/cmd/vodka/internal/version"
+	"github.com/pelletier/go-toml/v2"
 )
 
 const (
@@ -21,11 +23,12 @@ var (
 type writer struct {
 	dir      string
 	filename string
+	file     *os.File
+	data     interface{}
 }
 
 func (w *writer) Save() error {
-	
-	return nil
+	return toml.NewEncoder(w.file).Encode(w.data)
 }
 
 type GlobalMeta struct {
@@ -48,16 +51,23 @@ type Meta struct {
 func newMeta(idls []string, out string) *Meta {
 	now := util.Now()
 	m := &Meta{
-		writer: &writer{
-			dir:      filepath.Join(out, metaDir),
-			filename: metaFile,
-		},
 		IDLs:          idls,
 		Out:           out,
 		CreateVersion: version.Version,
 		CreatTime:     now,
 		UpdateTime:    now,
 	}
+	w := &writer{
+		dir:      filepath.Join(out, metaDir),
+		filename: metaFile,
+		data:     m,
+	}
+	var err error
+	w.file, err = os.Create(filepath.Join(w.dir, w.filename))
+	checkError(err, "create meta file")
+
+	m.writer = w
+
 	return m
 }
 
@@ -100,11 +110,18 @@ func cleanLog() {
 
 func CreateMeta(root string, idls []string) bool {
 	m := newMeta(idls, root)
-	m.Save()
+	err := m.Save()
+	checkError(err, "save meta file fail")
 	return true
 }
 
 func UpdateMeta(meta *Meta) bool {
 
 	return true
+}
+
+func checkError(err error, prompts string) {
+	if err == nil {
+		return
+	}
 }

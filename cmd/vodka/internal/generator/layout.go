@@ -1,11 +1,13 @@
 package generator
 
 type Layout struct {
+	root string
 }
 
-func NewLayout() *Layout {
-
-	l := &Layout{}
+func NewLayout(root string) *Layout {
+	l := &Layout{
+		root: root,
+	}
 	return l
 }
 
