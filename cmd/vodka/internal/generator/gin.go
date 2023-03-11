@@ -1,4 +1,11 @@
 package generator
 
-type GinCode struct {
+type Gin struct {
 }
+
+func NewGin() *Gin {
+	g := &Gin{}
+	return g
+}
+
+func (g *Gin) Gen() {}

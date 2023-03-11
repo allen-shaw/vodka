@@ -1,9 +1,16 @@
 package meta
 
 import (
-	"time"
+	"path/filepath"
 
 	"github.com/allen-shaw/vodka/cmd/vodka/internal/help"
+	"github.com/allen-shaw/vodka/cmd/vodka/internal/util"
+	"github.com/allen-shaw/vodka/cmd/vodka/internal/version"
+)
+
+const (
+	metaFile = "vodka.meta"
+	metaDir  = ".vodka"
 )
 
 var (
@@ -17,25 +24,41 @@ type writer struct {
 }
 
 func (w *writer) Save() error {
-
+	
 	return nil
 }
 
 type GlobalMeta struct {
-	writer
-	AutoUpgrade bool      `toml:"auto_upgrade"`
-	CreatTime   time.Time `toml:"create_time"`
-	UpdateTime  time.Time `toml:"update_time"`
-	UpgradeTime time.Time `toml:"upgrade_time"`
+	*writer
+	AutoUpgrade bool   `toml:"auto_upgrade"`
+	CreatTime   string `toml:"create_time"`
+	UpdateTime  string `toml:"update_time"`
+	UpgradeTime string `toml:"upgrade_time"`
 }
 
 type Meta struct {
-	writer
-	IDLs          []string  `toml:"idls"`
-	Out           string    `toml:"out"`
-	CreateVersion string    `toml:"create_version"`
-	CreatTime     time.Time `toml:"create_time"`
-	UpdateTime    time.Time `toml:"update_time"`
+	*writer
+	IDLs          []string `toml:"idls"`
+	Out           string   `toml:"out"`
+	CreateVersion string   `toml:"create_version"`
+	CreatTime     string   `toml:"create_time"`
+	UpdateTime    string   `toml:"update_time"`
+}
+
+func newMeta(idls []string, out string) *Meta {
+	now := util.Now()
+	m := &Meta{
+		writer: &writer{
+			dir:      filepath.Join(out, metaDir),
+			filename: metaFile,
+		},
+		IDLs:          idls,
+		Out:           out,
+		CreateVersion: version.Version,
+		CreatTime:     now,
+		UpdateTime:    now,
+	}
+	return m
 }
 
 func Init() {
@@ -75,8 +98,9 @@ func cleanLog() {
 
 }
 
-func CreateMeta(dir string, meta *Meta) bool {
-
+func CreateMeta(root string, idls []string) bool {
+	m := newMeta(idls, root)
+	m.Save()
 	return true
 }
 
