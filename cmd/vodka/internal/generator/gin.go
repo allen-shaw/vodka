@@ -1,35 +1,23 @@
 package generator
 
-type Gin struct {
-	root string
-	idls []string
+type ProtocGenGin struct {
 }
 
-func NewGin(root string, idls []string) *Gin {
-	g := &Gin{
-		root: root,
-		idls: idls,
-	}
-	return g
+func newProtocGenGin() *ProtocGenGin {
+	p := &ProtocGenGin{}
+
+	// 查找protoc-gen-gin,如果没有则安装
+	p.CheckOrInstall()
+
+	return p
+
 }
 
-func (g *Gin) Gen() {}
+func (p *ProtocGenGin) Run() {
+	// 调用protoc-gen-gin生成gin代码
 
-type DeployGenerator struct {
 }
 
-type IDLCopyer struct {
-}
+func (p *ProtocGenGin) CheckOrInstall() {
 
-type ScriptGenrator struct {
-	// build and boostrap
-}
-
-type GoModGenerator struct {
-}
-
-type GitIgnoreGenerator struct {
-}
-
-type MainGenerator struct {
 }
