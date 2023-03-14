@@ -1,4 +1,4 @@
-package template
+package layout
 
 var layoutTpl = defaultLayoutTpl
 

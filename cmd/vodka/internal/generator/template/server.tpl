@@ -16,6 +16,6 @@ func (s *HTTPServer) Run(addr string) error {
 
 func (s *HTTPServer) register() {
 {{range .Services}}
-	Register(s.e, New{{.Name}}())
+	Register{{.Name}}(s.e, New{{.Name}}())
 {{end}}
 }
