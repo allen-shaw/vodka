@@ -70,7 +70,7 @@ type Server struct {
 	Services []*Service
 }
 
-type RouterGenerator struct {
+type Router struct {
 	Package  string
 	FileName string // route_gen.go
 	Imports  []protogen.GoImportPath
