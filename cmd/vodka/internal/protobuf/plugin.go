@@ -22,10 +22,13 @@ func (p *Plugin) Run() int {
 		// 0. 版本
 		// 0.1 protoc版本
 		// 0.2 protoc-gen-gin 版本
-		// 1. 生成Server
+
+		// 1. 遍历所有文件
+		// 每个文件生成Service对象
+
+		// 2. 生成Server、router
 		// 1.1. 当前有哪些source files
 		// 1.2. 有哪些Service
-		// 2. 
 
 		for _, f := range gen.Files {
 			log.Debug("file:%v\n", f.Desc.Path())
