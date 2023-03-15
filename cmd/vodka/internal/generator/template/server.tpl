@@ -3,7 +3,7 @@ type HTTPServer struct {
 }
 
 func NewHttpServer() *HTTPServer {
-	s := &HTTPServer{}
+	s := new(HTTPServer)
 	e := gin.Default()
 	s.e = e
 	s.register()
@@ -15,7 +15,7 @@ func (s *HTTPServer) Run(addr string) error {
 }
 
 func (s *HTTPServer) register() {
-{{range .Services}}
+{{- range .Services}}
 	Register{{.Name}}(s.e, New{{.Name}}())
-{{end}}
+{{- end}}
 }

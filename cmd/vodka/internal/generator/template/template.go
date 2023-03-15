@@ -74,7 +74,7 @@ type Router struct {
 	Package  string
 	FileName string // route_gen.go
 	Imports  []protogen.GoImportPath
-	Servers  []*Server
+	Services []*Service
 }
 
 func NewServer(services []*Service) *Server {
@@ -91,4 +91,13 @@ func (s *Server) Gen(gen *protogen.Plugin) {
 
 	// comment := GetComment()
 	// g.p()
+}
+
+func NewRouter(services []*Service) *Router {
+	return &Router{
+		Package:  PkgInternal,
+		FileName: routerFileName,
+		Imports:  []protogen.GoImportPath{ginPkg},
+		Services: services,
+	}
 }

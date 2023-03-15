@@ -1,7 +1,7 @@
 type {{.Name}} interface {
-{{range .Methods}}
+{{- range .Methods}}
     {{.Name}}(ctx *gin.Context, req *api.{{.Request}}) (*api.{{.Reply}}, error)
-{{end}}
+{{- end}}
 }
 
 func New{{.Name}}() {{.Name}} {
@@ -11,9 +11,8 @@ func New{{.Name}}() {{.Name}} {
 type {{.PrivateName}} struct {
     // TODO: user implement
 }
-
-{{$name=.PrivateName}}
-{{range .Methods}}
+{{$name := .PrivateName}}
+{{- range .Methods}}
 func (s *{{$name}}) {{.Name}}(ctx *gin.Context, req *api.{{.Request}}) (*api.{{.Reply}}, error) {
     // TODO: user implement
 	panic("not implement")

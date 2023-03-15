@@ -18,16 +18,15 @@ func (s *{{.Name}}) Success(c *gin.Context, resp any) {
 	c.JSON(http.StatusOK, resp)
 }
 
-{{$serviceName=.Name}}
-{{range .Methods}} 
-func (s *{{$serviceName}}) .Name(c *gin.Context) {
+{{$serviceName:=.Name}}
+{{- range .Methods}} 
+func (s *{{$serviceName}}) {{.Name}}(c *gin.Context) {
     var req api.{{.Request}}
-
-    {{if .Method eq "Post"}}
+    {{ if eq .Method "Post"}}
     err := c.ShouldBindJSON(&req)
-    {{else if .Method eq "Get"}}
+    {{- else if eq .Method "Get"}}
     err := c.ShouldBindQuery(&req)
-    {{end}}
+    {{- end}}
 	if err != nil {
 		s.Error(c, http.StatusBadRequest, "invalid request")
 		return
