@@ -17,6 +17,7 @@ message HelloResp {
 service HelloService {
   rpc Hello(HelloReq) returns(HelloResp) {
     option (google.api.http) = {
+        group: "/hello"
         get: "/hello"
     };
   }

@@ -39,7 +39,9 @@ func GetComment(protocVersion string, source ...string) string {
 }
 
 type Method struct {
-	Name    string // SayHello
+	Name  string // SayHello
+	Group string // greeter
+
 	Num     int    // 一个 rpc 方法可以对应多个 http 请求
 	Request string // SayHelloReq
 	Reply   string // SayHelloResp
@@ -58,9 +60,18 @@ type Service struct {
 	FilePath string // api/helloworld/helloworld.proto
 
 	// HTTP properties
-	Group     string // greeter
 	Methods   []*Method
 	MethodSet map[string]*Method
+
+	Deprecated bool
+}
+
+func (s *Service) GenApi() {
+
+}
+
+func (s *Service) GenService() {
+
 }
 
 type Server struct {
@@ -70,33 +81,18 @@ type Server struct {
 	Services []*Service
 }
 
-type Router struct {
-	Package  string
-	FileName string // route_gen.go
-	Imports  []protogen.GoImportPath
-	Services []*Service
+func (s *Server) GenServer() {
+
+}
+
+func (s *Server) GenRouter() {
+
 }
 
 func NewServer(services []*Service) *Server {
 	return &Server{
 		Package:  PkgInternal,
 		FileName: serverFileName,
-		Imports:  []protogen.GoImportPath{ginPkg},
-		Services: services,
-	}
-}
-
-func (s *Server) Gen(gen *protogen.Plugin) {
-	// g := gen.NewGeneratedFile(s.FileName, s.Imports)
-
-	// comment := GetComment()
-	// g.p()
-}
-
-func NewRouter(services []*Service) *Router {
-	return &Router{
-		Package:  PkgInternal,
-		FileName: routerFileName,
 		Imports:  []protogen.GoImportPath{ginPkg},
 		Services: services,
 	}

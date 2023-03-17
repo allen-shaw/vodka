@@ -1,8 +1,15 @@
 package main
 
-import "github.com/allen-shaw/vodka/cmd/vodka/internal/protobuf"
+import (
+	"flag"
+
+	"github.com/allen-shaw/vodka/cmd/vodka/internal/protobuf"
+)
 
 func main() {
-	p := &protobuf.Plugin{}
+	vodka := flag.Bool("vodka", false, "run by vodka")
+	flag.Parse()
+
+	p := protobuf.NewPlugin(vodka)
 	p.Run()
 }

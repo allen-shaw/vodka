@@ -4,8 +4,10 @@ package hello;
 
 option go_package = "./hello";
 
+import "google/api/annotations.proto";
+
 message HelloReq {
-  string Name = 1;
+  string Name = 1[(google.api.query)="name"];
 }
 
 message HelloResp {
@@ -13,5 +15,9 @@ message HelloResp {
 }
 
 service HelloService {
-  rpc Hello(HelloReq) returns(HelloResp) {}
+  rpc Hello(HelloReq) returns(HelloResp) {
+    option (google.api.http) = {
+        get: "/hello"
+    };
+  }
 }

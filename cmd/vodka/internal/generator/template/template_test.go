@@ -36,8 +36,8 @@ var (
 		PrivateName: "hello1Service",
 		FullName:    "hello.hello1Service",
 		FilePath:    "./hello1.proto",
-		Group:       "hello",
-		Methods:     []*Method{method11, method12},
+
+		Methods: []*Method{method11, method12},
 		MethodSet: map[string]*Method{
 			method11.Name: method11,
 			method12.Name: method12,
@@ -48,14 +48,12 @@ var (
 		PrivateName: "hello2Service",
 		FullName:    "hello.hello2Service",
 		FilePath:    "./hello2.proto",
-		Group:       "",
 		Methods:     []*Method{method21},
 		MethodSet: map[string]*Method{
 			method21.Name: method21,
 		},
 	}
 	server = NewServer([]*Service{service1, service2})
-	router = NewRouter([]*Service{service1, service2})
 )
 
 func TestServerTpl(t *testing.T) {
@@ -73,7 +71,7 @@ func TestRouterTpl(t *testing.T) {
 	t1, err := template.ParseFiles(file)
 	assert.Nil(t, err)
 
-	t1.Execute(os.Stdout, router)
+	t1.Execute(os.Stdout, server)
 }
 
 func TestServiceTpl(t *testing.T) {
