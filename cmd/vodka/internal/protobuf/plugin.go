@@ -19,14 +19,18 @@ type Plugin struct {
 	srv        *template.Server
 	methodSets map[string]int
 
-	options Options
+	vodkaMode bool
+	gen       *protogen.Plugin
 }
 
 func NewPlugin(vodka bool) *Plugin {
 	p := &Plugin{
+		vodkaMode:  vodka,
 		methodSets: make(map[string]int, 0),
 	}
-	p.srv = template.NewServer(make([]*template.Service, 0))
+	p.srv = &template.Server{
+		Services: make([]*template.Service, 0),
+	}
 	return p
 }
 
@@ -38,6 +42,7 @@ func (p *Plugin) Run() int {
 
 	options.Run(func(gen *protogen.Plugin) error {
 		gen.SupportedFeatures = uint64(pluginpb.CodeGeneratorResponse_FEATURE_PROTO3_OPTIONAL)
+		p.gen = gen
 		// 0. 版本
 		// 0.1 protoc版本
 		// 0.2 protoc-gen-gin 版本
@@ -58,7 +63,7 @@ func (p *Plugin) Run() int {
 			p.srv.Services = append(p.srv.Services, svcs...)
 		}
 
-		p.genFiles(gen)
+		p.genFiles()
 
 		return nil
 	})
@@ -67,7 +72,7 @@ func (p *Plugin) Run() int {
 }
 
 func (p *Plugin) analysisFile(file *protogen.File) []*template.Service {
-	log.Debug("analysis file: %v\n", file.Desc.Path())
+	log.Debug("analysis file: %v\n", file.Desc.Path(), file.GoImportPath)
 
 	if len(file.Services) == 0 {
 		return nil
@@ -95,6 +100,9 @@ func (p *Plugin) analysisService(file *protogen.File, s *protogen.Service) *temp
 	svc.PrivateName = util.FirstLower(svc.Name)
 	svc.FullName = string(s.Desc.FullName())
 	svc.FilePath = file.Desc.Path()
+	svc.Prefix = getPreifx(svc.PrivateName)
+	svc.ProtoFile = file
+	svc.ProtoService = s
 
 	for _, method := range s.Methods {
 		m := p.analysisMethod(method)
@@ -121,9 +129,10 @@ func (p *Plugin) analysisMethod(m *protogen.Method) []*template.Method {
 		return methods
 	}
 
-	// 不配置rule则使用默认配置
-	methods = append(methods, p.defaultMethod(m))
-
+	// 在非vodka的模式下，不配置rule则使用默认配置
+	if !p.vodkaMode {
+		methods = append(methods, p.defaultMethod(m))
+	}
 	log.Debug("[Done] analysis method: %+v .\n", methods)
 
 	return methods
@@ -216,30 +225,38 @@ func (p *Plugin) buildMethodDesc(m *protogen.Method, httpMethod, path string) *t
 	}()
 
 	md := &template.Method{
-		Name:    m.GoName,
-		Group:   "",
-		Num:     p.methodSets[m.GoName],
-		Request: m.Input.GoIdent.GoName,
-		Reply:   m.Output.GoIdent.GoName,
-		Path:    path,
-		Method:  util.PascalCase(httpMethod),
+		Name:        m.GoName,
+		Group:       "",
+		Num:         p.methodSets[m.GoName],
+		Request:     m.Input.GoIdent.GoName,
+		Reply:       m.Output.GoIdent.GoName,
+		Path:        path,
+		Method:      util.PascalCase(httpMethod),
+		ProtoMethod: m,
 	}
 
 	return md
 }
 
-func (p *Plugin) genFiles(gen *protogen.Plugin) {
+func (p *Plugin) genFiles() {
 	// 1. 生成api -> ./internal/api/${serviceShortName}/${service_name}.go  // 允许用户修改
 	// 2. 生成model -> ./internal/model/api/${serviceShortName}/${service_name}.pb.go
 	// 3. 生成service -> ./internal/${serviceShortName}_gin.pb.go
-
 	for _, s := range p.srv.Services {
-		s.GenApi()
-		s.GenService()
+		template.NewApiGenerator(p.gen, p.vodkaMode, s).Gen()
+		template.NewServiceGenerator(p.gen, p.vodkaMode, s).Gen()
 	}
 
 	// 4. 生成router -> ./internal/router_gen.go
 	// 5. 生成server -> ./internal/server_gen.go
-	p.srv.GenRouter()
-	p.srv.GenServer()
+	template.NewRouterGenerator(p.gen, p.vodkaMode, p.srv).Gen()
+	template.NewServerGenerator(p.gen, p.vodkaMode, p.srv).Gen()
+}
+
+func getPreifx(s string) string {
+	i := strings.Index(s, "Service")
+	if i == -1 {
+		return s
+	}
+	return s[:i]
 }

@@ -7,9 +7,9 @@ import (
 )
 
 func main() {
-	vodka := flag.Bool("vodka", false, "run by vodka")
+	vodka := flag.Bool("vodka", true, "run by vodka")
 	flag.Parse()
 
-	p := protobuf.NewPlugin(vodka)
+	p := protobuf.NewPlugin(*vodka)
 	p.Run()
 }
