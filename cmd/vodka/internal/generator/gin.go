@@ -10,12 +10,11 @@ func newProtocGenGin() *ProtocGenGin {
 	p.CheckOrInstall()
 
 	return p
-
 }
 
 func (p *ProtocGenGin) Run() {
 	// 调用protoc-gen-gin生成gin代码
-
+	
 }
 
 func (p *ProtocGenGin) CheckOrInstall() {
