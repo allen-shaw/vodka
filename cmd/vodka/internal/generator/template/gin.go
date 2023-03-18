@@ -23,6 +23,7 @@ type Service struct {
 	FullName    string // helloworld.Greeter
 	FilePath    string // api/helloworld/helloworld.proto
 	Prefix      string
+	Group       string
 	// HTTP properties
 	Methods    []*Method
 	MethodSet  map[string]*Method

@@ -1,3 +1,18 @@
+{{.Comment}}
+
+package {{.Pkg}}
+
+import (
+{{- range .Imports }}   
+{{- if .Alias}} 
+    {{.Alias}} {{.Path}}
+{{- else}}
+    {{.Path}}
+{{- end}}
+{{- end}}
+)
+
+{{- $server := .Server}}
 type HTTPServer struct {
     e *gin.Engine
 }
@@ -15,7 +30,7 @@ func (s *HTTPServer) Run(addr string) error {
 }
 
 func (s *HTTPServer) register() {
-{{- range .Services}}
+{{- range $server.Services}}
 	Register{{.Name}}(s.e, New{{.Name}}())
 {{- end}}
 }
