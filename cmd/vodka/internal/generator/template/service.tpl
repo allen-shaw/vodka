@@ -1,25 +1,39 @@
-type {{.Name}} struct {
-    server {{.Group}}.{{.Name}}
+{{.Comment}}
+
+package {{.Pkg}}
+
+import (
+{{- range .Imports }}   
+{{- if .Alias}} 
+    {{.Alias}} {{.Path}}
+{{- else}}
+    {{.Path}}
+{{- end}}
+{{- end}}
+)
+{{- $service := .Service}}
+type {{$service.Name}} struct {
+    server {{$service.Prefix}}.{{$service.Name}}
 }
 
-func New{{.Name}}() *{{.Name}} {
-    return &{{.Name}}{server: {{.Group}}.New{{.Name}}}
+func New{{$service.Name}}() *{{$service.Name}} {
+    return &{{$service.Name}}{server: {{$service.Prefix}}.New{{$service.Name}}}
 }
 
-func (s *{{.Name}}) Error(c *gin.Context, code int, msg string) {
+func (s *{{$service.Name}}) Error(c *gin.Context, code int, msg string) {
 	c.AbortWithError(code, errors.New(msg))
 }
 
-func (s *{{.Name}}) ErrorWithResp(c *gin.Context, code int, resp any) {
+func (s *{{$service.Name}}) ErrorWithResp(c *gin.Context, code int, resp any) {
 	c.AbortWithStatusJSON(code, resp)
 }
 
-func (s *{{.Name}}) Success(c *gin.Context, resp any) {
+func (s *{{$service.Name}}) Success(c *gin.Context, resp any) {
 	c.JSON(http.StatusOK, resp)
 }
 
-{{$serviceName:=.Name}}
-{{- range .Methods}} 
+{{$serviceName:=$service.Name}}
+{{- range $service.Methods}} 
 func (s *{{$serviceName}}) {{.Name}}(c *gin.Context) {
     var req api.{{.Request}}
     {{ if eq .Method "Post"}}
