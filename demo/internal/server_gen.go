@@ -9,6 +9,7 @@ type HTTPServer struct {
 func NewHttpServer() *HTTPServer {
 	s := &HTTPServer{}
 	e := gin.Default()
+	e.UseH2C = true
 	s.e = e
 	s.register()
 	return s

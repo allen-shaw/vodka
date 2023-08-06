@@ -30,8 +30,6 @@ func (s *HelloService) Success(c *gin.Context, resp any) {
 func (s *HelloService) Hello(c *gin.Context) {
 	var req api.HelloReq
 
-	c.ShouldBindJSON()
-
 	err := c.ShouldBindQuery(&req)
 	if err != nil {
 		s.Error(c, http.StatusBadRequest, "invalid request")
